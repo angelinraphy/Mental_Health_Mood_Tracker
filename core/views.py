@@ -14,7 +14,10 @@ from django import forms
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('username', 'email', 'role')
+        fields = ('username', 'email', 'date_of_birth', 'role')
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -169,3 +172,49 @@ class PrescriptionCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['patient'] = get_object_or_404(User, id=self.kwargs['patient_id'])
         return context
+
+from .forms import SecurityQuestionResetForm
+from django.contrib.auth.forms import SetPasswordForm
+from django.views.generic import FormView
+
+class ForgotPasswordVerificationView(FormView):
+    template_name = 'core/password_reset.html'
+    form_class = SecurityQuestionResetForm
+    success_url = reverse_lazy('set_new_password')
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        date_of_birth = form.cleaned_data.get('date_of_birth')
+        
+        try:
+            user = User.objects.get(username=username, date_of_birth=date_of_birth)
+            self.request.session['reset_user_id'] = user.id
+            return super().form_valid(form)
+        except User.DoesNotExist:
+            messages.error(self.request, "No user found with that username and date of birth.")
+            return self.form_invalid(form)
+
+class SetNewPasswordView(FormView):
+    template_name = 'core/set_new_password.html'
+    form_class = SetPasswordForm
+    success_url = reverse_lazy('login')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user_id = self.request.session.get('reset_user_id')
+        if not user_id:
+            return kwargs
+        kwargs['user'] = get_object_or_404(User, id=user_id)
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.session.get('reset_user_id'):
+            messages.error(request, "You must verify your identity first.")
+            return redirect('password_reset')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.save()
+        del self.request.session['reset_user_id']
+        messages.success(self.request, "Your password has been successfully reset. You may log in now.")
+        return super().form_valid(form)

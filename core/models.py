@@ -15,6 +15,7 @@ class User(AbstractUser):
         choices=Role.choices,
         default=Role.PATIENT,
     )
+    date_of_birth = models.DateField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.role == Role.ADMIN:
