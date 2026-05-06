@@ -1,0 +1,121 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+    <h2>Welcome to your Wellness Space, {{ user.username }}</h2>
+    <div>
+        <a href="{% url 'mood_add' %}" class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm">+ Log Mood</a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Chart Section -->
+    <div class="col-md-8">
+        <div class="card shadow mb-4 border-0 rounded-3">
+            <div class="card-header bg-light py-3">
+                <h5 class="mb-0 text-primary fw-bold">Activity & Trends</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="moodChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- List & Care Team Section -->
+    <div class="col-md-4">
+        <!-- Doctor Profile -->
+        <div class="card shadow mb-4 border-0 rounded-3 text-center p-4">
+            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=150&h=150&q=80" alt="Dr. Arya D'coutho" class="rounded-circle mx-auto mb-3 shadow" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid rgba(255,255,255,0.2);">
+            <h5 class="fw-bold mb-1">Dr. Arya D'coutho</h5>
+            <p class="text-muted small mb-3">Lead Psychiatrist</p>
+        </div>
+        
+        <!-- Prescriptions -->
+        <div class="card shadow mb-4 border-0 rounded-3">
+            <div class="card-header bg-light py-3 border-bottom-0">
+                <h5 class="mb-0 text-primary fw-bold">⚕️ My Prescriptions</h5>
+            </div>
+            <div class="list-group list-group-flush rounded-bottom-3" style="max-height: 250px; overflow-y: auto;">
+                {% for p in prescriptions %}
+                <div class="list-group-item py-3">
+                    <h6 class="fw-bold mb-1"><span class="badge bg-success me-2">ACTIVE</span>{{ p.medicine_name }}</h6>
+                    <p class="mb-1 text-dark small fw-bold">Dosage: {{ p.dosage }}</p>
+                    {% if p.notes %}
+                    <p class="mb-1 text-muted small mt-2 bg-light p-2 rounded">{{ p.notes }}</p>
+                    {% endif %}
+                    <div class="text-end mt-1">
+                        <small class="fw-bold" style="font-size: 0.70rem; opacity: 0.6;">Prescribed by Dr. {{ p.doctor.username }} on {{ p.date_prescribed|date:"M d" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-muted text-center py-4">
+                    <small>No active prescriptions.</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card shadow border-0 rounded-3">
+            <div class="card-header bg-light py-3">
+                <h5 class="mb-0 text-primary fw-bold">Recent Entries</h5>
+            </div>
+            <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+                {% for entry in entries %}
+                <div class="list-group-item py-3 mood-card">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 fw-bold text-{% if entry.mood_level < 4 %}danger{% elif entry.mood_level < 7 %}warning{% else %}success{% endif %}">
+                            Level: {{ entry.mood_level }}/10
+                        </h5>
+                        <small class="text-muted">{{ entry.date|date:"M d, Y" }}</small>
+                    </div>
+                    <p class="mb-1 text-muted">{{ entry.notes|truncatechars:100 }}</p>
+                    <div class="mt-3 text-end">
+                        <a href="{% url 'mood_edit' entry.id %}" class="btn btn-sm btn-outline-info me-1">Edit</a>
+                        <a href="{% url 'mood_delete' entry.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-muted text-center py-5">
+                    <p class="mb-0">You have no mood entries yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('moodChart').getContext('2d');
+    const labels = [
+        {% for entry in entries reversed %} '{{ entry.date|date:"M d" }}', {% endfor %}
+    ];
+    const data = [
+        {% for entry in entries reversed %} {{ entry.mood_level }}, {% endfor %}
+    ];
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Mood Level History',
+                data: data,
+                borderColor: '#0d6efd',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: '#0d6efd'
+            }]
+        },
+        options: {
+            scales: {
+                y: { min: 0, max: 10, ticks: { stepSize: 1 } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

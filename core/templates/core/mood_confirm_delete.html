@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row pt-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow border-danger rounded-3">
+            <div class="card-header bg-danger text-white py-3">
+                <h4 class="mb-0 fw-bold">Confirm Deletion</h4>
+            </div>
+            <div class="card-body p-4">
+                <p class="lead">Are you sure you want to delete your mood entry from <strong>{{ object.date }}</strong> with mood level <strong>{{ object.mood_level }}</strong>?</p>
+                <form method="post" class="mt-4 d-flex justify-content-between">
+                    {% csrf_token %}
+                    <a href="{% url 'patient_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-danger px-4 fw-bold">Yes, Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

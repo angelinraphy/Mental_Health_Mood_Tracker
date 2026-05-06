@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row pt-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow border-0 rounded-3">
+            <div class="card-header bg-transparent border-0 text-center pb-0 pt-4">
+                <h4 class="mb-0 fw-bold">{% if object %}Edit Mood{% else %}Log New Mood{% endif %}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'patient_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold">Save Entry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-header bg-transparent border-0 text-center pb-0 pt-4">
+                <h4 class="mb-0 fw-bold">Sign In</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" autocomplete="off" novalidate>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mt-3">Login</button>
+                </form>
+                <div class="mt-4 text-center">
+                    <p class="mb-2"><a href="/password_reset/" class="text-decoration-none">Forgot Password?</a></p>
+                    <p class="text-muted">Don't have an account? <a href="{% url 'register' %}" class="text-decoration-none fw-bold">Register here</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('form input[type="text"], form input[type="password"]');
+        
+        inputs.forEach(input => {
+            // Make inputs readonly by default so the password manager skips them
+            input.setAttribute('readonly', 'readonly');
+            input.setAttribute('autocomplete', 'new-password');
+            
+            // Staggered clearing to beat delayed injections from password managers
+            input.value = '';
+            setTimeout(() => { input.value = ''; }, 100);
+            setTimeout(() => { input.value = ''; }, 500);
+            
+            // Remove readonly when the user actually tries to type
+            const enableTyping = function() {
+                input.removeAttribute('readonly');
+            };
+            input.addEventListener('focus', enableTyping);
+            input.addEventListener('click', enableTyping);
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

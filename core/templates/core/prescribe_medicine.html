@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row pt-4 justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-4 mt-2">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3 rounded-top-4">
+                <h5 class="mb-0 fw-bold">Prescribe Medication</h5>
+                <a href="{% url 'doctor_dashboard' %}" class="btn btn-sm btn-outline-light rounded-pill px-3 fw-bold">Back to Dashboard</a>
+            </div>
+            <div class="card-body p-5 rounded-bottom-4">
+                <div class="mb-4 text-center">
+                    <span style="font-size: 3rem;">💊</span>
+                    <h4 class="fw-bold mt-2">Patient: {{ patient.username }}</h4>
+                    <p class="text-muted">Fill out the details below to securely assign a medication plan.</p>
+                </div>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Medicine Name</label>
+                        {{ form.medicine_name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Dosage & Frequency</label>
+                        {{ form.dosage }}
+                        <small class="text-muted">e.g., 20mg twice daily after meals</small>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Doctor's Notes (Optional)</label>
+                        {{ form.notes }}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">Save Prescription</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

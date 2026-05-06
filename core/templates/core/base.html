@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Tracker | Premium Mental Wellness</title>
+    <!-- Title Bar Icon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    <!-- Fonts & Bootstrap 5 CSR -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --glass-bg-dark: rgba(10, 10, 20, 0.45);
+            --glass-border-dark: rgba(255, 255, 255, 0.08);
+            --glass-bg-light: rgba(255, 255, 255, 0.6);
+            --glass-border-light: rgba(255, 255, 255, 0.3);
+            /* Full Multi-Color Gradient */
+            --primary-gradient: linear-gradient(135deg, #ec4899, #8b5cf6, #06b6d4, #10b981);
+            background-size: 300% 300%;
+        }
+        body { 
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.6s ease, color 0.6s ease;
+            min-height: 100vh;
+            background-size: cover;
+            background-attachment: fixed;
+            letter-spacing: 0.3px;
+        }
+        /* Multi-Color Background Implementation */
+        [data-bs-theme="dark"] body {
+            background-color: #050510;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(236, 72, 153, 0.3), transparent 50%), 
+                radial-gradient(circle at 90% 10%, rgba(139, 92, 246, 0.3), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.3), transparent 50%),
+                radial-gradient(circle at 20% 90%, rgba(16, 185, 129, 0.25), transparent 50%),
+                linear-gradient(-45deg, #020205, #080a14, #0a0510);
+            background-size: 100% 100%;
+            animation: breathe 15s ease infinite alternate;
+            color: #f8fafc;
+        }
+        [data-bs-theme="light"] body {
+            background-color: #f4f4f9;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(236, 72, 153, 0.2), transparent 50%), 
+                radial-gradient(circle at 90% 10%, rgba(139, 92, 246, 0.2), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.2), transparent 50%),
+                radial-gradient(circle at 20% 90%, rgba(16, 185, 129, 0.15), transparent 50%),
+                linear-gradient(-45deg, #ffffff, #fdfdff, #f8faff);
+            background-size: 100% 100%;
+            animation: breathe 15s ease infinite alternate;
+            color: #1e1e24;
+        }
+        @keyframes breathe {
+            0% { background-position: 0% 50%; opacity: 0.9; }
+            100% { background-position: 100% 50%; opacity: 1; }
+        }
+
+        /* Sleek Glassmorphism Navbar */
+        .navbar {
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-bottom: 1px solid var(--glass-border-dark);
+            background: var(--glass-bg-dark) !important;
+            padding: 1.2rem 0;
+            box-shadow: inset 0 -1px 0 rgba(255,255,255,0.05), 0 10px 40px rgba(0,0,0,0.3);
+        }
+        [data-bs-theme="light"] .navbar {
+            background: var(--glass-bg-light) !important;
+            border-bottom: 1px solid var(--glass-border-light);
+            box-shadow: inset 0 -1px 0 rgba(255,255,255,0.5), 0 10px 40px rgba(0,0,0,0.05);
+        }
+        .colorful-heading {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
+        }
+        [data-bs-theme="light"] .colorful-heading {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+        }
+        .navbar-brand { 
+            font-family: 'Dancing Script', cursive;
+            font-weight: 700; 
+            font-size: 2.6rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            animation: textGlow 5s ease-in-out infinite alternate;
+        }
+        @keyframes textGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.4)); }
+            100% { filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.6)); }
+        }
+        .nav-link { font-weight: 600; opacity: 0.75; transition: all 0.3s ease; letter-spacing: 0.5px; }
+        .nav-link:hover { opacity: 1; transform: translateY(-1px); color: #06b6d4 !important; }
+        
+        /* Premium Floating Cards */
+        .card, .glass-panel {
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            background: rgba(15, 15, 30, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 20px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+            position: relative;
+        }
+        /* Subtle shine overlay on cards */
+        .card::before, .glass-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.03), transparent);
+            transform: skewX(-25deg);
+            animation: shine 8s infinite;
+        }
+        @keyframes shine { 100% { left: 200%; } }
+
+        [data-bs-theme="light"] .card, [data-bs-theme="light"] .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,1), 0 20px 40px rgba(6, 182, 212, 0.05);
+        }
+        .card:hover { transform: translateY(-8px); box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 30px 60px rgba(0,0,0,0.35); }
+        [data-bs-theme="light"] .card:hover { box-shadow: inset 0 1px 1px rgba(255,255,255,1), 0 30px 60px rgba(6, 182, 212, 0.1); }
+        
+        /* Premium Forms and Inputs */
+        .form-control, .form-select, .form-input-premium input, input[type="text"], input[type="password"], input[type="email"] {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            color: inherit;
+            padding: 1rem 1.4rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 1rem;
+            width: 100%;
+            display: block;
+        }
+        [data-bs-theme="light"] .form-control, [data-bs-theme="light"] .form-select, [data-bs-theme="light"] .form-input-premium input, [data-bs-theme="light"] input[type="text"], [data-bs-theme="light"] input[type="password"], [data-bs-theme="light"] input[type="email"] {
+            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+            color: #1e1e24;
+        }
+        .form-control:focus, .form-select:focus, .form-input-premium input:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+            background: rgba(255,255,255,0.06);
+            border-color: #ec4899;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), 0 0 0 4px rgba(236, 72, 153, 0.2);
+            color: inherit;
+            outline: none;
+        }
+        [data-bs-theme="light"] .form-control:focus, [data-bs-theme="light"] .form-select:focus, [data-bs-theme="light"] .form-input-premium input:focus, [data-bs-theme="light"] input[type="text"]:focus, [data-bs-theme="light"] input[type="password"]:focus, [data-bs-theme="light"] input[type="email"]:focus {
+            background: #ffffff;
+            color: #1e1e24;
+        }
+        
+        /* Premium Buttons */
+        .btn { border-radius: 14px; font-weight: 700; padding: 0.7rem 1.8rem; transition: all 0.3s ease; letter-spacing: 0.5px; border: 1px solid transparent; }
+        .btn-primary {
+            background: var(--primary-gradient);
+            background-size: 200% auto;
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-primary:hover {
+            background-position: right center;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.5);
+            color: #ffffff;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #f43f5e);
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(239, 68, 68, 0.5);
+            color: #ffffff;
+        }
+        .btn-outline-secondary {
+            border-color: rgba(255,255,255,0.2);
+            color: inherit;
+            backdrop-filter: blur(10px);
+        }
+        .btn-outline-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.4);
+            color: inherit;
+        }
+        
+        /* Premium Tables */
+        .table { background: transparent; color: inherit; }
+        .table > :not(caption) > * > * {
+            background: transparent;
+            border-bottom-color: rgba(255,255,255,0.04);
+            color: inherit;
+            padding: 1.2rem;
+            vertical-align: middle;
+        }
+        [data-bs-theme="light"] .table > :not(caption) > * > * {
+            border-bottom-color: rgba(0,0,0,0.04);
+        }
+        .table-dark th { 
+            background: rgba(0,0,0,0.2) !important; 
+            border: none; 
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        [data-bs-theme="light"] .table-dark th { 
+            background: rgba(0,0,0,0.03) !important; 
+            color: #475569; 
+        }
+
+        /* Utilities & Components */
+        .list-group-item { background: transparent; color: inherit; border-color: rgba(255,255,255,0.06); }
+        [data-bs-theme="light"] .list-group-item { border-color: rgba(0,0,0,0.06); }
+        .card-header { background: rgba(0,0,0,0.15) !important; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        [data-bs-theme="light"] .card-header { background: rgba(0,0,0,0.03) !important; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        
+        ul.errorlist, .helptext { display: none !important; }
+        .text-muted { opacity: 0.7; }
+        [data-bs-theme="light"] .text-white { color: #0f172a !important; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg mb-5 sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+                <span style="font-family: 'Segoe UI Emoji', sans-serif; -webkit-text-fill-color: initial; -webkit-background-clip: initial; filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));">🧠</span> 
+                <span>Mental Health Mood Tracker</span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navs">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navs">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    <li class="nav-item">
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill me-2" id="themeToggle" style="border-width: 2px;">
+                            <span id="themeIcon">🌓</span>
+                        </button>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link text-white px-3" href="{% url 'home' %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link text-white px-3" href="{% url 'password_change' %}">Change Password</a></li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-4 ms-2 fw-bold" style="border-width: 2px;">Sign Out</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link text-white px-3" href="{% url 'login' %}">Sign In</a></li>
+                    <li class="nav-item"><a class="btn btn-primary btn-sm rounded-pill px-4 text-dark" href="{% url 'register' %}">Get Started</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mb-5">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 1. Toast popups for general success/error messages
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: '{% if message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% else %}success{% endif %}',
+                    title: '{{ message|escapejs }}',
+                    showConfirmButton: false,
+                    timer: 4500
+                });
+            {% endfor %}
+        {% endif %}
+
+        // 2. Center modal popups for form validation errors instead of in the field
+        const errorLists = document.querySelectorAll('ul.errorlist li');
+        if (errorLists.length > 0) {
+            let errorMsg = '';
+            errorLists.forEach(li => {
+                errorMsg += errorMsg ? ('<br>' + li.innerText) : li.innerText;
+            });
+            Swal.fire({
+                icon: 'error',
+                title: 'Something is missing!',
+                html: errorMsg,
+                confirmButtonColor: '#0d6efd'
+            });
+        }
+
+        // Theme toggle logic
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+        
+        // Restore theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        }
+
+        // Add Show Password toggle to all password fields dynamically
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordInputs = document.querySelectorAll('input[type="password"]');
+            passwordInputs.forEach(input => {
+                // Create a wrapper
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.style.display = 'block';
+                wrapper.style.width = '100%';
+                
+                // Replace the input with the wrapper and put input inside
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+                
+                // Create the toggle icon
+                const toggleIcon = document.createElement('span');
+                toggleIcon.innerHTML = '👁️';
+                toggleIcon.style.position = 'absolute';
+                toggleIcon.style.right = '15px';
+                toggleIcon.style.top = '50%';
+                toggleIcon.style.transform = 'translateY(-50%)';
+                toggleIcon.style.cursor = 'pointer';
+                toggleIcon.style.zIndex = '10';
+                toggleIcon.style.opacity = '0.6';
+                toggleIcon.style.transition = 'opacity 0.3s ease';
+                toggleIcon.style.fontSize = '1.1rem';
+                
+                toggleIcon.addEventListener('mouseover', () => toggleIcon.style.opacity = '1');
+                toggleIcon.addEventListener('mouseout', () => toggleIcon.style.opacity = '0.6');
+                
+                // Click to toggle
+                toggleIcon.addEventListener('click', function() {
+                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                    input.setAttribute('type', type);
+                    // Use a recognizable icon text/emoji for hidden vs shown
+                    toggleIcon.innerHTML = type === 'password' ? '👁️' : '🙈';
+                });
+                
+                wrapper.appendChild(toggleIcon);
+                input.style.paddingRight = '45px'; // protect text from overlapping icon
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

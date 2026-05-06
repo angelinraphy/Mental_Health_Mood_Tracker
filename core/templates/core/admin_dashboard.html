@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mb-4 mt-4">
+    <h2 class="fw-bold">Admin Dashboard</h2>
+    <p class="text-muted">System Administration and User Overview</p>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow border-0 rounded-3">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4 py-3">Username</th>
+                            <th class="py-3">Email</th>
+                            <th class="py-3">Role</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3 text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sys_user in users %}
+                        <tr>
+                            <td class="ps-4 align-middle fw-bold">{{ sys_user.username }}</td>
+                            <td class="align-middle">{{ sys_user.email }}</td>
+                            <td class="align-middle">
+                                <span class="badge bg-info text-dark rounded-pill px-3">{{ sys_user.get_role_display }}</span>
+                            </td>
+                            <td class="align-middle">
+                                {% if sys_user.is_active %}
+                                <span class="badge bg-success rounded-pill px-3">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger rounded-pill px-3">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle text-end pe-4">
+                                {% if sys_user != user %}
+                                    <a href="{% url 'user_delete' sys_user.pk %}" class="btn btn-sm btn-outline-danger rounded-pill shadow-sm px-3">Delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-5">No users found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
