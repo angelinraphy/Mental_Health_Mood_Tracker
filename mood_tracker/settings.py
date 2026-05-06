@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-)-_wpsv$ajw-vl02bhf$_lshex64z75-=r7%=^z1d!hf=$(wq1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['moodtracker.local', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['moodtracker.local', '127.0.0.1', 'localhost', '18.61.211.109']
 
 
 # Application definition
